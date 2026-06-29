@@ -24,57 +24,41 @@ This starts:
 
 The web app lives in `apps/web`. The generated Expo mobile app lives in `apps/mobile`, but the current styled KaamSarthi experience is in the Next web app.
 
-## Local Voice Typing
+## Local & Cloud Voice Typing
 
-KaamSarthi uses Faster-Whisper with the multilingual Whisper Small model.
+KaamSarthi uses Faster-Whisper with the multilingual Whisper Small model for local speech-to-text, with native browser speech services as fallbacks.
 
-- Languages: English, Hindi, Tamil, Telugu, and Bengali
-- Processing: local CPU only, using `int8`
-- Recording limit: 30 seconds
-- Live updates: approximately every 6 seconds
-- Privacy: temporary audio is deleted after every transcription request
-- Offline use: works without internet after the initial model download
+- **Languages**: English, Hindi, Tamil, Telugu, and Bengali.
+- **Auto-proceed & Shortcuts**: When KaamSarthi starts, it opens a Language Setup screen and listens for a language sample. If a language is detected, a 3-second countdown begins before auto-selecting it. If the worker explicitly says the word **"Hindi"**, the system immediately switches to Hindi and proceeds.
+- **Processing**: Local CPU only using `int8`.
+- **Privacy & Fallbacks**: Works offline. If microphone permission is denied or the local speech service is unavailable, manual typing and browser voice typing remain fully functional.
 
-Whenever KaamSarthi opens, it immediately requests microphone access and starts listening for a short language sample. Browsers require the worker to press **Allow** the first time microphone permission is requested. After permission is granted, the detected language is selected automatically. A manual language choice is always available.
-
-Moving sound bars show when the microphone is receiving the worker's voice. Weak or silent interim guesses are not used to select the language; selection happens only after the completed recording contains transcribed speech.
-
-If microphone permission is denied or the speech service is unavailable, all normal typing and selection controls continue to work.
-
-## Spoken Guidance
+## Spoken Guidance & Text-To-Speech (TTS)
 
 After language selection, KaamSarthi can speak instructions in the worker's language.
 
-- On first use, the worker can tap or say yes/no to spoken guidance.
-- New workers are asked one simple profile and resume question at a time.
-- Every spoken answer is read back and must be confirmed.
-- Nothing is saved until the worker checks the final summary and presses the large Continue button.
-- Casual commands include repeat, go back, skip, stop, resume, jobs, applications, assistant, and home.
-- Asking for jobs opens the Jobs tab, prioritizes matching categories, and reads suitable jobs aloud.
-- Returning workers can enable or disable automatic spoken welcome using the toggle.
-- The floating `Talk to KaamSarthi` button reopens guidance from any screen.
+- **Profile & Resume Setup**: New workers are asked simple questions one by one. Spoken answers are transcribed and must be confirmed.
+- **Interactive Speech**: When questions are asked, the app reads the questions aloud. When user responses are submitted or the AI responds, the speech engine speaks the text.
+- **TTS Toggle**: A speaker icon (🔊/🔇) allows workers to mute or unmute the voice assistant at any time.
+- **Supported TTS Languages**: English and Hindi are fully supported with fallback detection for device-installed voices.
 
-Speech playback uses the device's installed browser/Windows voices, so it does not require another downloaded AI model. Profile, resume, preferences, and guide progress remain local.
+## Cloud & Local AI Assistant
 
-## Local AI Assistant
+KaamSarthi supports dual modes for the AI Assistant:
 
-KaamSarthi uses the free, open-source `Gemma 3 1B` model through Ollama.
+1. **Cloud AI Assistant (Gemini)**:
+   - Powered by Gemini 2.5 Flash via Google AI Studio.
+   - Activated by adding `NEXT_PUBLIC_GEMINI_API_KEY=your_key` in `apps/web/.env.local`.
+   - Streams responses token-by-token and automatically reads outputs in Hindi or English depending on selected language.
+   - Strictly outputs response in the selected application language.
+2. **Local AI Assistant (Ollama)**:
+   - Runs locally using the `Gemma 3 1B` model.
+   - Automatically falls back to rule-based safety responses (for salary, fraud, Aadhaar, OTP questions) if Ollama/Gemini are offline.
 
-- Runs locally; prompts and answers are not sent to a cloud AI service
-- Responds in English, Hindi, Tamil, Telugu, or Bengali
-- Streams words onto the screen while the answer is generated
-- Uses short employment-counselor instructions instead of acting like a general chatbot
-- Caches up to 30 repeated answers in `localStorage`
-- Uses vetted rule-based answers for salary, fraud, fees, Aadhaar, and OTP questions
-- Automatically falls back to rules when Ollama is unavailable
+## Desktop layout & Sidebars
 
-The Assistant screen has a `Local AI` / `Simple` switch. The choice is remembered on the device.
-
-To prepare AI on another Windows computer, install Ollama and run:
-
-```powershell
-.\install-ai.cmd
-```
+For desktop users, the app UI displays horizontal developer credit headers on both sides:
+- **Developer - KSHITIZ SINGH, email - kshitizsingh422@gmail.com**
 
 ## Installed Storage
 
@@ -105,7 +89,8 @@ The installer creates an isolated `.venv` and downloads the model on first use.
 Speech service:
 
 ```powershell
-.\speech-service\start-speech.cmd
+cd speech-service
+.\start-speech.cmd
 ```
 
 Web app:

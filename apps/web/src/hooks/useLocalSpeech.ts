@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-export type SpeechLanguage = 'en' | 'hi' | 'ta' | 'te' | 'bn';
+export type SpeechLanguage = 'en' | 'hi';
 export type SpeechStatus =
   | 'idle'
   | 'checking'
@@ -11,7 +11,7 @@ export type SpeechStatus =
   | 'unavailable'
   | 'error';
 
-interface TranscriptionResult {
+export interface TranscriptionResult {
   text: string;
   language: string;
   languageName: string;
@@ -20,7 +20,7 @@ interface TranscriptionResult {
   isFinal: boolean;
 }
 
-interface UseLocalSpeechOptions {
+export interface UseLocalSpeechOptions {
   language?: SpeechLanguage;
   detectLanguage?: boolean;
   maxDurationMs?: number;
@@ -38,7 +38,16 @@ function preferredMimeType() {
   return options.find((type) => MediaRecorder.isTypeSupported(type)) || '';
 }
 
-export function useLocalSpeech({
+import { useCloudSpeech } from './useCloudSpeech';
+
+export function useLocalSpeech(options: UseLocalSpeechOptions) {
+  const isCloudSupported = typeof window !== 'undefined' && !!((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
+  const cloud = useCloudSpeech(options);
+  const local = useLocalSpeechBackend(options);
+  return isCloudSupported ? cloud : local;
+}
+
+function useLocalSpeechBackend({
   language,
   detectLanguage = false,
   maxDurationMs = 30_000,

@@ -13,9 +13,6 @@ export default function LandingPage() {
   const langs = [
     { code: 'en', name: 'English', flag: '🇬🇧' },
     { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
-    { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
-    { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
-    { code: 'bn', name: 'বাংলা', flag: '🇮🇳' },
   ] as const;
 
   const handleDemo = () => {

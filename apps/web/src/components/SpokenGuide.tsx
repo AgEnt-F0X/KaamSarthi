@@ -634,8 +634,9 @@ export default function SpokenGuide() {
             <button
               type="button"
               onClick={() => {
-                if (isListening) stop();
-                else {
+                if (isListening) {
+                  stop();
+                } else {
                   stopSpeaking();
                   void start();
                 }
@@ -645,7 +646,7 @@ export default function SpokenGuide() {
               }`}
             >
               {isListening ? <MicOff size={26} /> : <Mic size={26} />}
-              {isListening ? copy.listening : copy.waiting}
+              {isListening ? copy.listening : 'Tap to speak'}
             </button>
           )}
 

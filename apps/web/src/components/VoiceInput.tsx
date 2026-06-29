@@ -59,11 +59,11 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
             void start();
           }
         }}
-        aria-label={isListening ? 'Stop voice typing' : 'Start voice typing'}
-        title={isListening ? 'Stop voice typing' : 'Start voice typing'}
+        aria-label={isListening ? 'Stop voice typing' : 'Tap to voice type'}
+        title={isListening ? 'Stop voice typing' : 'Tap to voice type'}
         className={`size-12 shrink-0 rounded-full flex items-center justify-center transition-colors ${
           isListening
-            ? 'bg-red-500 text-white'
+            ? 'bg-red-500 text-white animate-pulse'
             : 'bg-blue-600 text-white shadow-lg shadow-blue-200'
         }`}
       >

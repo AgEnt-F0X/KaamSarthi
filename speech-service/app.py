@@ -19,35 +19,26 @@ MODEL_NAME = os.getenv("KAAMSARTHI_WHISPER_MODEL", "small")
 SUPPORTED_LANGUAGES = {
     "en": "English",
     "hi": "Hindi",
-    "ta": "Tamil",
-    "te": "Telugu",
-    "bn": "Bengali",
 }
 LANGUAGE_PROMPTS = {
     "en": (
-        "KaamSarthi employment profile. Jobs, driver, delivery, construction, warehouse, "
-        "security guard, factory worker, electrician, plumber, housekeeping, salary, resume, "
-        "skills, experience, interview, Delhi, Noida, Gurugram, Faridabad."
+        "KaamSarthi employment profile. My name is, I am from, I have experience in, "
+        "I want a job as, my phone number is, my mobile number is, years of experience, "
+        "jobs, driver, delivery boy, construction worker, warehouse helper, security guard, "
+        "factory worker, electrician, plumber, housekeeping, cleaning, cooking, helper, "
+        "labour, labor, salary, resume, skills, experience, interview, "
+        "Delhi, Mumbai, Noida, Gurugram, Gurgaon, Faridabad, Ghaziabad, Bangalore, "
+        "Hyderabad, Pune, Chennai, Kolkata, Lucknow, Jaipur. "
+        "Yes, no, okay, next, done, save, go back, submit, hello, hi, thank you."
     ),
     "hi": (
-        "कामसारथी रोजगार प्रोफ़ाइल। नौकरी, ड्राइवर, डिलीवरी, निर्माण, गोदाम, सुरक्षा गार्ड, "
-        "फैक्ट्री कर्मचारी, इलेक्ट्रीशियन, प्लंबर, सफाई कर्मचारी, वेतन, रिज्यूमे, कौशल, अनुभव, "
-        "इंटरव्यू, दिल्ली, नोएडा, गुरुग्राम, फरीदाबाद।"
-    ),
-    "ta": (
-        "காம்சாரதி வேலைவாய்ப்பு சுயவிவரம். வேலை, ஓட்டுநர், டெலிவரி, கட்டுமானம், கிடங்கு, "
-        "பாதுகாப்பு காவலர், தொழிற்சாலை, மின்சார உதவியாளர், பிளம்பர், தூய்மை பணியாளர், "
-        "சம்பளம், சுயவிவரம், திறன்கள், அனுபவம், நேர்காணல்."
-    ),
-    "te": (
-        "కామ్‌సారథి ఉద్యోగ ప్రొఫైల్. ఉద్యోగం, డ్రైవర్, డెలివరీ, నిర్మాణం, గిడ్డంగి, "
-        "భద్రతా గార్డు, ఫ్యాక్టరీ కార్మికుడు, ఎలక్ట్రీషియన్, ప్లంబర్, హౌస్‌కీపింగ్, "
-        "జీతం, రెజ్యూమే, నైపుణ్యాలు, అనుభవం, ఇంటర్వ్యూ."
-    ),
-    "bn": (
-        "কামসারথি কর্মসংস্থান প্রোফাইল। চাকরি, চালক, ডেলিভারি, নির্মাণ, গুদাম, "
-        "নিরাপত্তারক্ষী, কারখানা কর্মী, ইলেকট্রিশিয়ান, প্লাম্বার, পরিচ্ছন্নতা কর্মী, "
-        "বেতন, জীবনবৃত্তান্ত, দক্ষতা, অভিজ্ঞতা, সাক্ষাৎকার।"
+        "कामसारथी रोजगार प्रोफ़ाइल। मेरा नाम है, मैं रहता हूँ, मुझे नौकरी चाहिए, "
+        "मेरा फोन नंबर है, मेरा मोबाइल नंबर है, साल का अनुभव, "
+        "नौकरी, ड्राइवर, डिलीवरी, निर्माण, मजदूर, गोदाम, सुरक्षा गार्ड, चौकीदार, "
+        "फैक्ट्री कर्मचारी, मिस्त्री, इलेक्ट्रीशियन, प्लंबर, सफाई कर्मचारी, रसोइया, हेल्पर, "
+        "वेतन, तनखा, पगार, रिज्यूमे, कौशल, अनुभव, इंटरव्यू, "
+        "दिल्ली, मुंबई, नोएडा, गुरुग्राम, फरीदाबाद, गाज़ियाबाद, बैंगलोर, लखनऊ, जयपुर। "
+        "हाँ, नहीं, ठीक है, अगला, आगे, पीछे, हो गया, सबमिट।"
     ),
 }
 MAX_AUDIO_BYTES = 15 * 1024 * 1024
@@ -136,8 +127,11 @@ async def transcribe(
             _, _, language_probabilities = model.detect_language(
                 audio=audio_data,
                 vad_filter=True,
-                vad_parameters=VadOptions(min_silence_duration_ms=350),
-                language_detection_segments=3,
+                vad_parameters=VadOptions(
+                    min_silence_duration_ms=300,
+                    speech_pad_ms=200,
+                ),
+                language_detection_segments=4,
                 language_detection_threshold=0.0,
             )
             supported_probabilities = [
@@ -156,19 +150,22 @@ async def transcribe(
         segments, info = model.transcribe(
             audio_data,
             language=selected_language,
-            beam_size=3 if is_final else 1,
-            best_of=3 if is_final else 1,
-            patience=1.1 if is_final else 1,
+            task="transcribe",
+            beam_size=5 if is_final else 3,
+            best_of=5 if is_final else 3,
+            patience=1.2 if is_final else 1.0,
             temperature=0,
-            condition_on_previous_text=True,
+            condition_on_previous_text=False,
             initial_prompt=LANGUAGE_PROMPTS.get(selected_language or ""),
             vad_filter=True,
             vad_parameters={
-                "min_silence_duration_ms": 300,
-                "speech_pad_ms": 250,
+                "min_silence_duration_ms": 250,
+                "speech_pad_ms": 300,
             },
-            no_speech_threshold=0.55,
-            log_prob_threshold=-1.0,
+            no_speech_threshold=0.45,
+            log_prob_threshold=-0.7,
+            repetition_penalty=1.15,
+            no_repeat_ngram_size=3,
         )
         text = " ".join(segment.text.strip() for segment in segments).strip()
         detected_code = selected_language or info.language

@@ -6,9 +6,6 @@ import type { Language } from '@/context/AppContext';
 const VOICE_LANGS: Record<Language, string> = {
   en: 'en-IN',
   hi: 'hi-IN',
-  ta: 'ta-IN',
-  te: 'te-IN',
-  bn: 'bn-IN',
 };
 
 export function useSpeechSynthesis(language: Language) {
@@ -43,10 +40,17 @@ export function useSpeechSynthesis(language: Language) {
       utterance.lang = requested;
       utterance.rate = language === 'en' ? 0.88 : 0.82;
       utterance.pitch = 1;
-      utterance.voice =
-        voices.find((voice) => voice.lang.toLowerCase() === requested.toLowerCase()) ||
-        voices.find((voice) => voice.lang.toLowerCase().startsWith(language)) ||
-        null;
+
+      // Find the best matching voice
+      const selectedVoice = 
+        voices.find((v) => v.lang.toLowerCase() === requested.toLowerCase()) ||
+        voices.find((v) => v.lang.toLowerCase().startsWith(language)) ||
+        (language === 'hi' ? voices.find((v) => v.name.toLowerCase().includes('hindi') || v.lang.toLowerCase().includes('hi')) : undefined);
+      
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      }
+
       utterance.onstart = () => setIsSpeaking(true);
       utterance.onend = () => {
         setIsSpeaking(false);
