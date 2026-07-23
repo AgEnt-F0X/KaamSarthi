@@ -187,6 +187,7 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
 };
 
 const cacheDir = path.join(__dirname, "caches");
+fs.mkdirSync(cacheDir, { recursive: true });
 
 config.cacheStores = () => [
 	new FileStore({
@@ -194,40 +195,5 @@ config.cacheStores = () => [
 	}),
 ];
 config.resetCache = false;
-config.fileMapCacheDirectory = cacheDir;
-config.reporter = {
-	...config.reporter,
-	update: (event) => {
-		config.reporter?.update(event);
-		const reportableErrors = [
-			"error",
-			"bundling_error",
-			"cache_read_error",
-			"hmr_client_error",
-			"transformer_load_failed",
-		];
-		for (const errorType of reportableErrors) {
-			if (event.type === errorType) {
-				reportErrorToRemote({ error: event.error }).catch((_reportError) => {
-					// no-op
-				});
-			}
-		}
-		return event;
-	},
-};
-
-const originalGetTransformOptions = config.transformer.getTransformOptions;
-
-config.transformer = {
-	...config.transformer,
-	getTransformOptions: async (entryPoints, options) => {
-		if (options.dev === false) {
-			fs.rmSync(cacheDir, { recursive: true, force: true });
-			fs.mkdirSync(cacheDir);
-		}
-		return await originalGetTransformOptions(entryPoints, options);
-	},
-};
 
 module.exports = config;
