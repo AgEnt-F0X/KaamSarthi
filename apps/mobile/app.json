@@ -5,7 +5,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
@@ -43,29 +43,18 @@
       [
         "expo-build-properties",
         {
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34
+          },
           "ios": {
             "useFrameworks": "static"
           }
         }
       ],
-      [
-        "expo-video",
-        {
-          "supportsBackgroundPlayback": true,
-          "supportsPictureInPicture": true
-        }
-      ],
       "expo-font",
       "expo-secure-store",
-      "expo-web-browser",
-      "@sentry/react-native/expo",
-      [
-        "react-native-google-mobile-ads",
-        {
-          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
-          "iosAppId": "ca-app-pub-3940256099942544~1458002511"
-        }
-      ]
+      "expo-web-browser"
     ],
     "web": {
       "bundler": "metro",
