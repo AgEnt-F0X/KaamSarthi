@@ -6,11 +6,17 @@ import * as Constants from 'expo-constants';
 
 export default function Index() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      const { status } = await Audio.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
+      try {
+        const { status } = await Audio.requestPermissionsAsync();
+        setHasPermission(status === 'granted');
+      } catch (err) {
+        console.warn('Audio permission request error:', err);
+        setHasPermission(false);
+      }
     })();
   }, []);
 
@@ -35,6 +41,17 @@ export default function Index() {
         javaScriptEnabled={true}
         domStorageEnabled={true}
         originWhitelist={['*']}
+        startInLoadingState={true}
+        renderLoading={() => (
+          <View style={styles.loadingOverlay}>
+            <ActivityIndicator size="large" color="#0000ff" />
+          </View>
+        )}
+        onError={(syntheticEvent) => {
+          const { nativeEvent } = syntheticEvent;
+          console.warn('WebView error:', nativeEvent);
+          setError(`Failed to load: ${nativeEvent.description || 'Network Error'}`);
+        }}
       />
     </View>
   );
@@ -47,5 +64,11 @@ const styles = StyleSheet.create({
   },
   webview: {
     flex: 1,
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
   },
 });
