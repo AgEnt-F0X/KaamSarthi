@@ -37,8 +37,6 @@ yarn-error.*
 
 app-example
 
-.env
-
 .metro-virtual/*
 
 caches/*
