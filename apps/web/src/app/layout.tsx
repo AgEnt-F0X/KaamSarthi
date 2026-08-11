@@ -24,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="flex flex-col items-center gap-2">
             <span className="text-xl xl:text-2xl font-black text-white tracking-widest uppercase opacity-90">Developer</span>
             <span className="text-2xl xl:text-3xl font-black text-emerald-400 tracking-widest uppercase opacity-90">KSHITIZ SINGH</span>
-            <span className="text-sm xl:text-base font-bold text-slate-400 tracking-wide opacity-80 mt-1">kshitizsingh422@gmail.com</span>
+            <span className="text-base xl:text-lg font-bold text-slate-300 tracking-wide opacity-90 mt-2">Contributor - Kabir Khan</span>
           </div>
         </div>
 
@@ -43,7 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="flex flex-col items-center gap-2">
             <span className="text-xl xl:text-2xl font-black text-white tracking-widest uppercase opacity-90">Developer</span>
             <span className="text-2xl xl:text-3xl font-black text-emerald-400 tracking-widest uppercase opacity-90">KSHITIZ SINGH</span>
-            <span className="text-sm xl:text-base font-bold text-slate-400 tracking-wide opacity-80 mt-1">kshitizsingh422@gmail.com</span>
+            <span className="text-base xl:text-lg font-bold text-slate-300 tracking-wide opacity-90 mt-2">Contributor - Vedansh Singh</span>
           </div>
         </div>
       </body>
