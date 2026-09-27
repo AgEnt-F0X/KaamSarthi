@@ -16972,6 +16972,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-mmkv@patch:react-native-mmkv@npm%3A3.3.0#~/.yarn/patches/react-native-mmkv+3.3.0.patch":
+  version: 3.3.0
+  resolution: "react-native-mmkv@patch:react-native-mmkv@npm%3A3.3.0#~/.yarn/patches/react-native-mmkv+3.3.0.patch::version=3.3.0&hash=0cfb6c"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/4a893f8e925fab3d91e8c4e26eaf64523d9a427341b6bb716bbe12ac5d80dc7f0463827979e33de06147975b926b022764a51114d5bd4100195f8b79cb896805
+  languageName: node
+  linkType: hard
+
 "react-native-reanimated-carousel@npm:4.0.2":
   version: 4.0.2
   resolution: "react-native-reanimated-carousel@npm:4.0.2"
