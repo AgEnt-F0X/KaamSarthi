@@ -19,15 +19,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="bg-slate-900 antialiased min-h-screen flex justify-center items-stretch">
-        {/* Left developer credit sidebar */}
-        <div className="hidden lg:flex flex-col items-center justify-center flex-1 select-none pointer-events-none p-8 text-center">
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-xl xl:text-2xl font-black text-white tracking-widest uppercase opacity-90">Developer</span>
-            <span className="text-2xl xl:text-3xl font-black text-emerald-400 tracking-widest uppercase opacity-90">KSHITIZ SINGH</span>
-            <span className="text-base xl:text-lg font-bold text-slate-300 tracking-wide opacity-90 mt-2">Contributor - Kabir Khan</span>
-          </div>
-        </div>
-
         <AppProvider>
           <VoiceLanguageSetup />
           <SpokenGuide />
@@ -37,15 +28,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Toaster position="top-center" richColors />
           </div>
         </AppProvider>
-
-        {/* Right developer credit sidebar */}
-        <div className="hidden lg:flex flex-col items-center justify-center flex-1 select-none pointer-events-none p-8 text-center">
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-xl xl:text-2xl font-black text-white tracking-widest uppercase opacity-90">Developer</span>
-            <span className="text-2xl xl:text-3xl font-black text-emerald-400 tracking-widest uppercase opacity-90">KSHITIZ SINGH</span>
-            <span className="text-base xl:text-lg font-bold text-slate-300 tracking-wide opacity-90 mt-2">Contributor - Vedansh Singh</span>
-          </div>
-        </div>
       </body>
     </html>
   );
