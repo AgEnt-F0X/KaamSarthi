@@ -7,6 +7,7 @@ import { Toaster } from 'sonner';
 import BottomNav from '@/components/BottomNav';
 import VoiceLanguageSetup from '@/components/VoiceLanguageSetup';
 import SpokenGuide from '@/components/SpokenGuide';
+import SarvamCreditBadge from '@/components/SarvamCreditBadge';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -22,6 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AppProvider>
           <VoiceLanguageSetup />
           <SpokenGuide />
+          <SarvamCreditBadge />
           <div className="w-full max-w-[430px] bg-white min-h-screen relative shadow-2xl overflow-x-hidden flex flex-col pb-[128px]">
             <main className="flex-1 overflow-y-auto">{children}</main>
             <BottomNav />

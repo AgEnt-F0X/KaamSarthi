@@ -6,6 +6,9 @@ import type { Language } from '@/context/AppContext';
 const VOICE_LANGS: Record<Language, string> = {
   en: 'en-IN',
   hi: 'hi-IN',
+  ta: 'ta-IN',
+  te: 'te-IN',
+  bn: 'bn-IN',
 };
 
 export function useSpeechSynthesis(language: Language) {

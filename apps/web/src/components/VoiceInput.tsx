@@ -2,13 +2,14 @@
 
 import React from 'react';
 import { Mic, MicOff } from 'lucide-react';
-import { useLocalSpeech, type SpeechLanguage } from '@/hooks/useLocalSpeech';
+import { useAppSpeech } from '@/hooks/useAppSpeech';
 import { VoiceActivityBars } from '@/components/VoiceActivityBars';
+import type { Language } from '@/context/AppContext';
 
 interface VoiceInputProps {
   onTranscript: (text: string) => void;
   onInterimTranscript?: (text: string) => void;
-  language: SpeechLanguage;
+  language: Language;
   appendTo?: string;
   className?: string;
 }
@@ -33,7 +34,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
     audioLevels,
     hasReceivedVoice,
     isListening,
-  } = useLocalSpeech({
+  } = useAppSpeech({
     language,
     onInterimTranscript: (text) =>
       (onInterimTranscript || onTranscript)(withBaseText(text)),

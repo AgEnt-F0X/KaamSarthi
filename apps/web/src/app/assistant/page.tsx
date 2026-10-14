@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from '@/components/motion';
 import { Bot, Send, Sparkles, StopCircle, Trash2, Volume2, VolumeX, Zap } from 'lucide-react';
 import { VoiceInput } from '@/components/VoiceInput';
 import { useGemini } from '@/hooks/useGemini';
-import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
+import { useSarvamTTS, type SarvamTTSLanguage } from '@/hooks/useSarvamTTS';
 import { getRuleBasedAdvice, shouldUseRuleBasedAdvice } from '@/lib/ruleBasedAdvisor';
 
 const copy: Record<
@@ -36,7 +36,42 @@ const copy: Record<
     geminiReady: 'Gemini AI',
     quickReplies: ['मेरे लिए नौकरी ढूंढें', 'रिज्यूमे सुधारें', 'इंटरव्यू टिप्स', 'नौकरी धोखे से सुरक्षा'],
   },
+  ta: {
+    title: 'நான் உங்களுக்கு எப்படி உதவ முடியும்?',
+    intro: 'வேலைகள், சுயவிவரங்கள், நேர்காணல்கள், சம்பளம் அல்லது வேலை பாதுகாப்பு பற்றி கேளுங்கள்।',
+    thinking: 'சிந்திக்கிறது...',
+    placeholder: 'உங்கள் கேள்வியை தட்டச்சு செய்வது அல்லது பேசுதல்...',
+    geminiReady: 'Gemini AI',
+    quickReplies: ['எனக்கு வேலை கண்டுபிடிக்கவும்', 'என் சுயவிவரத்தை மேம்படுத்தவும்', 'நேர்காணல் விதிகள்', 'வேலை மோசடி பாதுகாப்பு'],
+  },
+  te: {
+    title: 'నేను మీకు ఎలా సహాయపడగలను?',
+    intro: 'ఉద్యోగాలు, రెజ్యూమేలు, ఇంటర్వ్యూలు, జీతం లేదా ఉద్యోగ భద్రత గురించి అడగండి।',
+    thinking: 'ఆలోచిస్తోంది...',
+    placeholder: 'మీ ప్రశ్నను టైప్ చేయండి లేదా మాట్లాడండి...',
+    geminiReady: 'Gemini AI',
+    quickReplies: ['నాకు ఉద్యోగం కనుగొనండి', 'నా రెజ్యూమేని మెరుగుపరచండి', 'ఇంటర్వ్యూ చిట్కాలు', 'ఉద్యోగ అపరాధ భద్రత'],
+  },
+  bn: {
+    title: 'আমি আপনাকে কিভাবে সাহায্য করতে পারি?',
+    intro: 'চাকরি, রেজিউমে, ইন্টারভিউ, বেতন বা চাকরির নিরাপত্তা নিয়ে প্রশ্ন করুন।',
+    thinking: 'চিন্তা করছে...',
+    placeholder: 'আপনার প্রশ্ন টাইপ করুন বা বলুন...',
+    geminiReady: 'Gemini AI',
+    quickReplies: ['আমার জন্য চাকরি খুঁজুন', 'আমার রেজিউমে উন্নত করুন', 'ইন্টারভিউ টিপস', 'চাকরির প্রতারণা থেকে সুরক্ষা'],
+  },
 };
+
+function toSarvamLanguage(lang: Language): SarvamTTSLanguage {
+  const map: Record<Language, SarvamTTSLanguage> = {
+    en: 'en-IN',
+    hi: 'hi-IN',
+    ta: 'ta-IN',
+    te: 'te-IN',
+    bn: 'bn-IN',
+  };
+  return map[lang] || 'hi-IN';
+}
 
 function MessageBubble({ msg }: { msg: Pick<Message, 'role' | 'content' | 'timestamp'> }) {
   const [time, setTime] = useState('');
@@ -88,7 +123,8 @@ function StreamingBubble({ text }: { text: string }) {
 export default function AssistantPage() {
   const { chatHistory, appendChatMessage, clearChat, t, language, user } = useApp();
   const { generate, cancel, status: geminiStatus } = useGemini({ language });
-  const { speak, cancel: stopSpeaking, isSpeaking } = useSpeechSynthesis(language);
+  const sarvamLang = toSarvamLanguage(language);
+  const { speak, cancel: stopSpeaking, isSpeaking } = useSarvamTTS();
   const [ttsEnabled, setTtsEnabled] = useState(true);
   const [input, setInput] = useState('');
   const [streamingText, setStreamingText] = useState('');
@@ -134,7 +170,7 @@ export default function AssistantPage() {
       : '';
 
     try {
-      if (ttsEnabled) speak(cleanMessage);
+      if (ttsEnabled) speak(cleanMessage, { language: sarvamLang });
       setStreamingText(languageCopy.thinking);
       const answer = await generate({
         message: cleanMessage,
@@ -144,7 +180,7 @@ export default function AssistantPage() {
       });
       if (answer) {
         appendChatMessage('assistant', answer);
-        if (ttsEnabled) speak(answer);
+        if (ttsEnabled) speak(answer, { language: sarvamLang });
       }
     } catch {
       appendChatMessage('assistant', getRuleBasedAdvice(cleanMessage, language));

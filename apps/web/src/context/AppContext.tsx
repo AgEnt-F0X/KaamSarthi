@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { translations, seedJobs } from '../data/constants';
 import { toast } from 'sonner';
 
-export type Language = 'en' | 'hi';
+export type Language = 'en' | 'hi' | 'ta' | 'te' | 'bn';
 
 export interface User {
   id: string;

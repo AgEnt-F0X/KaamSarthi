@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-export type SpeechLanguage = 'en' | 'hi';
+export type SpeechLanguage = 'en' | 'hi' | 'ta' | 'te' | 'bn';
 export type SpeechStatus =
   | 'idle'
   | 'checking'

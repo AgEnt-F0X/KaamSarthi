@@ -18,9 +18,9 @@ import {
   Volume2,
   X,
 } from 'lucide-react';
-import { useApp, type User } from '@/context/AppContext';
-import { useLocalSpeech } from '@/hooks/useLocalSpeech';
-import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
+import { useApp, type User, type Language } from '@/context/AppContext';
+import { useAppSpeech } from '@/hooks/useAppSpeech';
+import { useSarvamTTS, type SarvamTTSLanguage } from '@/hooks/useSarvamTTS';
 import { VoiceActivityBars } from '@/components/VoiceActivityBars';
 import { localizeJob } from '@/data/jobTranslations';
 import styles from './SpokenGuide.module.css';
@@ -79,7 +79,7 @@ function normalizeMobile(value: string) {
 export default function SpokenGuide() {
   const { language, user, jobs, login, updateProfile } = useApp();
   const router = useRouter();
-  const copy = GUIDE_COPY[language];
+  const copy = GUIDE_COPY[language] || GUIDE_COPY.en;
   const [phase, setPhase] = useState<Phase>('closed');
   const [startupEnabled, setStartupEnabled] = useState(true);
   const [currentFieldIndex, setCurrentFieldIndex] = useState(0);
@@ -106,15 +106,29 @@ export default function SpokenGuide() {
     audioLevels,
     hasReceivedVoice,
     isListening,
-  } = useLocalSpeech({
+  } = useAppSpeech({
     language,
+    detectLanguage: false,
     maxDurationMs: 20_000,
-    updateIntervalMs: 6_000,
     onInterimTranscript: setHeardText,
     onFinalTranscript: (text) => handleVoiceTextRef.current(text),
   });
-  const { speak, cancel: stopSpeaking, isSpeaking, supported: speechSupported } =
-    useSpeechSynthesis(language);
+
+  function toSarvamLanguage(lang: Language): SarvamTTSLanguage {
+    const map: Record<Language, SarvamTTSLanguage> = {
+      en: 'en-IN',
+      hi: 'hi-IN',
+      ta: 'ta-IN',
+      te: 'te-IN',
+      bn: 'bn-IN',
+    };
+    return map[lang] || 'hi-IN';
+  }
+
+  const sarvamLang = toSarvamLanguage(language);
+
+  const { speak, cancel: stopSpeaking, isSpeaking, error: ttsError } =
+    useSarvamTTS();
 
   const speakPrompt = useCallback(
     (text: string, listenAfter = false) => {
@@ -122,13 +136,12 @@ export default function SpokenGuide() {
       const sequence = ++speechSequenceRef.current;
       setSpokenPrompt(text);
       setHeardText('');
-      speak(text, () => {
-        if (listenAfter && speechSequenceRef.current === sequence) {
-          window.setTimeout(() => startListeningRef.current(), 250);
-        }
-      });
+      speak(text, { language: sarvamLang });
+      if (listenAfter && speechSequenceRef.current === sequence) {
+        window.setTimeout(() => startListeningRef.current(), 250);
+      }
     },
-    [speak, stop]
+    [speak, stop, sarvamLang]
   );
 
   const askField = useCallback(
@@ -140,21 +153,21 @@ export default function SpokenGuide() {
       setPhase('question');
       speakPrompt(copy.fields[GUIDE_FIELDS[safeIndex]].question, true);
     },
-    [copy.fields, speakPrompt]
+    [copy, speakPrompt]
   );
 
   const openMenu = useCallback(() => {
     setPhase('menu');
     setPendingAction(null);
     speakPrompt(copy.menu, true);
-  }, [copy.menu, speakPrompt]);
+  }, [copy, speakPrompt]);
 
   const startResumeGuide = useCallback(() => {
     setDraft(emptyDraft(user));
     setReturnToReview(false);
     speakPrompt(copy.actionDone.resume);
     window.setTimeout(() => askField(0), 500);
-  }, [askField, copy.actionDone.resume, speakPrompt, user]);
+  }, [askField, copy, speakPrompt, user]);
 
   const requestAction = useCallback(
     (action: GuideAction) => {
@@ -162,7 +175,7 @@ export default function SpokenGuide() {
       setPhase('action-confirm');
       speakPrompt(copy.openAction[action], true);
     },
-    [copy.openAction, speakPrompt]
+    [copy, speakPrompt]
   );
 
   const closeGuide = useCallback(() => {
@@ -197,7 +210,7 @@ export default function SpokenGuide() {
       .map((job, index) => `${index + 1}. ${job.title}, ${job.company}, ${job.salary}`)
       .join('. ');
     speakPrompt(`${copy.actionDone.jobs} ${summary}`);
-  }, [copy.actionDone.jobs, jobs, language, speakPrompt, user]);
+  }, [copy, jobs, language, speakPrompt, user]);
 
   const executeAction = useCallback(
     (action: GuideAction) => {
@@ -231,7 +244,7 @@ export default function SpokenGuide() {
       }
     },
     [
-      copy.actionDone,
+      copy,
       jobs,
       router,
       speakPrompt,
@@ -265,7 +278,7 @@ export default function SpokenGuide() {
     }
   }, [
     askField,
-    copy.reviewHelp,
+    copy,
     currentFieldIndex,
     pendingAnswer,
     returnToReview,
@@ -301,7 +314,7 @@ export default function SpokenGuide() {
     }
   }, [
     askField,
-    copy.reviewHelp,
+    copy,
     currentFieldIndex,
     returnToReview,
     speakPrompt,
@@ -336,7 +349,7 @@ export default function SpokenGuide() {
     setPhase('done');
     router.push('/resume');
     speakPrompt(copy.saved);
-  }, [copy.saved, draft, language, login, router, speakPrompt, updateProfile, user]);
+  }, [copy, draft, language, login, router, speakPrompt, updateProfile, user]);
 
   const handleVoiceText = useCallback(
     (text: string) => {
@@ -569,9 +582,9 @@ export default function SpokenGuide() {
         <div key={phase} className={`${styles.phase} p-5 space-y-5`}>
           <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
             <p className="text-base font-bold leading-7 text-emerald-950">{spokenPrompt}</p>
-            {!speechSupported && (
+            {ttsError && (
               <p className="mt-2 text-xs text-amber-800">
-                Spoken playback is not available in this browser. The written guide still works.
+                Voice playback unavailable: {ttsError}. The written guide still works.
               </p>
             )}
           </div>

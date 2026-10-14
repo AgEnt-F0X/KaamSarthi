@@ -160,13 +160,14 @@ export function useCloudSpeech({
       recognition.continuous = true;
       recognition.interimResults = true;
       
-      if (language === 'hi') {
-        recognition.lang = 'hi-IN';
-      } else if (language === 'en') {
-        recognition.lang = 'en-IN';
-      } else {
-        recognition.lang = 'en-US';
-      }
+      const bcp47Map: Record<string, string> = {
+        hi: 'hi-IN',
+        en: 'en-IN',
+        ta: 'ta-IN',
+        te: 'te-IN',
+        bn: 'bn-IN',
+      };
+      recognition.lang = bcp47Map[language || 'en'] || 'en-IN';
       
       recognitionRef.current = recognition;
 
@@ -191,10 +192,18 @@ export function useCloudSpeech({
          }
          
          if (detectLanguage && fullText.trim()) {
+            const nameMap: Record<string, string> = {
+              hi: 'Hindi',
+              en: 'English',
+              ta: 'Tamil',
+              te: 'Telugu',
+              bn: 'Bengali',
+            };
+            const currentLang = language || 'en';
             onLanguageDetected?.({
               text: fullText,
-              language: language || 'en',
-              languageName: language === 'hi' ? 'Hindi' : 'English',
+              language: currentLang,
+              languageName: nameMap[currentLang] || 'English',
               languageProbability: 1.0,
               supported: true,
               isFinal: false
