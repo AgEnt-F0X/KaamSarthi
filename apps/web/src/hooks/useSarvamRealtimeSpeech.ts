@@ -155,6 +155,10 @@ export function useSarvamRealtimeSpeech(options: UseSarvamRealtimeSpeechOptions)
     const audioContext = audioContextRef.current;
     if (!audioContext) return;
 
+    if (audioContext.state === 'suspended') {
+      await audioContext.resume();
+    }
+
     // Create a simple script processor for capturing audio (fallback for browsers without AudioWorklet)
     if (audioContext.audioWorklet) {
       try {

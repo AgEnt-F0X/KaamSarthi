@@ -292,6 +292,10 @@ export function useSarvamSpeech(options: UseSarvamSpeechOptions) {
       const audioContext = new AudioContextClass();
       audioContextRef.current = audioContext;
 
+      if (audioContext.state === 'suspended') {
+        await audioContext.resume();
+      }
+
       const analyser = audioContext.createAnalyser();
       analyser.fftSize = 512;
       analyser.minDecibels = -85;
