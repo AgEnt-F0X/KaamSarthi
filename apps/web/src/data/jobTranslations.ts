@@ -1,9 +1,9 @@
 import type { Language } from '@/context/AppContext';
 import { seedJobs } from '@/data/constants';
 
-type Job = (typeof seedJobs)[number];
+export type Job = (typeof seedJobs)[number];
 
-type JobText = {
+export type JobText = {
   title: string;
   company: string;
   location: string;
@@ -24,51 +24,51 @@ const jobText: Record<Language, Record<number, JobText>> = {
   },
   hi: {
     1: { title: 'ड्राइवर', company: 'दिल्ली लॉजिस्टिक्स', location: 'दिल्ली' },
-    2: { title: 'डिलीवरी साथी', company: 'फास्टकार्ट', location: 'नोएडा' },
+    2: { title: 'डिलीवरी पार्टनर', company: 'फास्टकार्ट', location: 'नोएडा' },
     3: { title: 'निर्माण मजदूर', company: 'बिल्ड इंडिया कॉर्प', location: 'गुरुग्राम' },
     4: { title: 'गोदाम सहायक', company: 'स्मार्ट वेयरहाउसिंग', location: 'दिल्ली' },
     5: { title: 'सुरक्षा गार्ड', company: 'सिक्योर इंडिया', location: 'नोएडा' },
     6: { title: 'फैक्ट्री कर्मचारी', company: 'मैन्यूटेक लिमिटेड', location: 'फरीदाबाद' },
-    7: { title: 'इलेक्ट्रीशियन सहायक', company: 'पावरफिक्स कंपनी', location: 'दिल्ली' },
-    8: { title: 'डिलीवरी कर्मचारी', company: 'क्विकशिप', location: 'गुरुग्राम' },
+    7: { title: 'इलेक्ट्रीशियन हेल्पर', company: 'पावरफिक्स कंपनी', location: 'दिल्ली' },
+    8: { title: 'डिलीवरी एग्जीक्यूटिव', company: 'क्विकशिप', location: 'गुरुग्राम' },
     9: { title: 'ट्रक ड्राइवर', company: 'नेशनल फ्रेट', location: 'दिल्ली' },
-    10: { title: 'सफाई कर्मचारी', company: 'क्लीनप्रो सर्विसेज', location: 'नोएडा' },
+    10: { title: 'सफाई / हाउसकीपिंग स्टाफ', company: 'क्लीनप्रो सर्विसेज', location: 'नोएडा' },
   },
   ta: {
-    1: { title: 'ஓட்டுநர்', company: 'தெல्हி லஜிஸ்டிக்ஸ்', location: 'தெல्हி' },
-    2: { title: 'டெலிவரி பங்குதரர்', company: 'ஃபாஸ்ட் கார்ட்', location: 'நொய்டா' },
-    3: { title: 'கட்டுமான ஒழியர்', company: 'பில் இந்தியா கார்ப்', location: 'குருக்ராம்' },
-    4: { title: 'கிடங்கு உதவியாளர்', company: 'ஸ்மார்ட் வேர்ஹௌசிங்', location: 'தெல्हி' },
-    5: { title: 'பாதுகாப்பு гвар்டு', company: 'சிக்யூர் இந்தியா', location: 'நொய்டா' },
-    6: { title: 'தொழிற்சாலை பணியாளர்', company: 'மென்யூ்டெக் லிமிடெட்', location: 'ஃபெரிதாபாத்' },
-    7: { title: 'மின்சாரச் சேவையாளர்', company: 'பவர் ஃபிக்ஸ் காங்கeries', location: 'தெல्हி' },
-    8: { title: 'டெலிவரி அதிகாரி', company: 'க்விக் ஷிப்', location: 'குருக்ராம்' },
-    9: { title: 'தேர் ஓட்டுநர்', company: 'நேசனல் ফ্রைட்', location: 'தெல्हி' },
-    10: { title: 'வீட்டு பேணிக்கை பணியாளர்', company: 'கிளீன் ப்ரோ சர்விசஸ்', location: 'நொய்டா' },
+    1: { title: 'ஓட்டுநர்', company: 'டெல்லி லாஜிஸ்டிக்ஸ்', location: 'டெல்லி' },
+    2: { title: 'டெலிவரி பார்ட்னர்', company: 'பாஸ்ட்கார்ட்', location: 'நொய்டா' },
+    3: { title: 'கட்டுமான தொழிலாளி', company: 'பில்ட் இந்தியா கார்ப்', location: 'குருகிராம்' },
+    4: { title: 'கிடங்கு உதவியாளர்', company: 'ஸ்மார்ட் வேர்ஹவுசிங்', location: 'டெல்லி' },
+    5: { title: 'பாதுகாப்பு காவலர்', company: 'செக்யூர் இந்தியா', location: 'நொய்டா' },
+    6: { title: 'தொழிற்சாலை பணியாளர்', company: 'மேனுடெக் லிமிடெட்', location: 'பரிதாபாத்' },
+    7: { title: 'எலக்ட்ரீஷியன் உதவியாளர்', company: 'பவர்ஃபிக்ஸ் நிறுவனம்', location: 'டெல்லி' },
+    8: { title: 'டெலிவரி பணியாளர்', company: 'குவிக்ஷிப்', location: 'குருகிராம்' },
+    9: { title: 'லாரி ஓட்டுநர்', company: 'நேஷனல் ஃப்ரைட்', location: 'டெல்லி' },
+    10: { title: 'தூய்மைப் பணியாளர்', company: 'கிளீன்புரோ சர்வீசஸ்', location: 'நொய்டா' },
   },
   te: {
-    1: { title: 'డ్రైవర్', company: 'దెల్హి లాజిస్టిక్స్', location: 'దెల్హి' },
-    2: { title: 'డెలివరీiendas', company: 'ఫాస్ట్ కార్ట్', location: 'నోయిడా' },
-    3: { title: 'నిర్మాణ మజదూరు', company: 'బిల్డ్ ఇండియా కార్ప్', location: 'గురుಗ್ರామ్' },
-    4: { title: 'గోడౌన్ సహాయకుడు', company: 'స్మార్ట్ వేరేహౌజింగ్', location: 'దెల్హి' },
-    5: { title: 'సెక్యూరిటి గార్డ్', company: 'సెక్యూర్ ఇండియా', location: 'నోయిడా' },
-    6: { title: 'ఫ్యాక్టరీ কর্মचారి', company: 'మానూటెక్ లిమిటెడ్', location: 'ఫరీదాబాద్' },
-    7: { title: 'ఎలక్ట్రీషియన్ సహాయకుడు', company: 'పవర్ ఫిక్స్ కంపెనీ', location: 'దెల్హి' },
-    8: { title: 'డెలివరీ ఎక్జిక్యూటివ్', company: 'క్విక్ షిప్', location: 'గురుగ్రామ్' },
-    9: { title: 'ట్రక్ డ్రైవర్', company: 'నాషనల్ ఫ్రేట్', location: 'దెల్హి' },
-    10: { title: 'హౌస్ కీపింగ్ స్టాఫ్', company: 'క్లీన్ ప్రో సర్విసెస్', location: 'నోయిడా' },
+    1: { title: 'డ్రైవర్', company: 'ఢిల్లీ లాజిస్టిక్స్', location: 'ఢిల్లీ' },
+    2: { title: 'డెలివరీ పార్టనర్', company: 'ఫాస్ట్‌కార్ట్', location: 'నోయిడా' },
+    3: { title: 'నిర్మాణ కార్మికుడు', company: 'బిల్డ్ ఇండియా కార్ప్', location: 'గురుగ్రామ్' },
+    4: { title: 'గిడ్డంగి సహాయకుడు', company: 'స్మార్ట్ వేర్‌హౌసింగ్', location: 'ఢిల్లీ' },
+    5: { title: 'సెక్యూరిటీ గార్డ్', company: 'సెక్యూర్ ఇండియా', location: 'నోయిడా' },
+    6: { title: 'ఫ్యాక్టరీ కార్మికుడు', company: 'మ్యానుటెక్ లిమిటెడ్', location: 'ఫరీదాబాద్' },
+    7: { title: 'ఎలక్ట్రీషియన్ హెల్పర్', company: 'పవర్‌ఫిక్స్ కో', location: 'ఢిల్లీ' },
+    8: { title: 'డెలివరీ ఎగ్జిక్యూటివ్', company: 'క్విక్‌షిప్', location: 'గురుగ్రామ్' },
+    9: { title: 'ట్రక్ డ్రైవర్', company: 'నేషనల్ ఫ్రైట్', location: 'ఢిల్లీ' },
+    10: { title: 'హౌస్‌కీపింగ్ సిబ్బంది', company: 'క్లీన్‌ప్రో సర్వీసెస్', location: 'నోయిడా' },
   },
   bn: {
-    1: { title: 'চালক', company: 'দিল্লি লজিস্টিক্স', location: 'দিল্লি' },
-    2: { title: 'ডেলিভারি партনার', company: 'ফাস্টকার্ট', location: 'নয়েডা' },
+    1: { title: 'ড্রাইভার (চালক)', company: 'দিল্লি লজিস্টিকস', location: 'দিল্লি' },
+    2: { title: 'ডেলিভারি পার্টনার', company: 'ফাস্টকার্ট', location: 'নয়ডা' },
     3: { title: 'নির্মাণ শ্রমিক', company: 'বিল্ড ইন্ডিয়া কর্প', location: 'গুরুগ্রাম' },
-    4: { title: 'গোদাম সহায়ক', company: 'স্মার্ট వేयरহাউজিং', location: 'দিল্লি' },
-    5: { title: 'নিরাপত্তা গার্ড', company: 'সিকিউর ইন্ডিয়া', location: 'নয়েডা' },
-    6: { title: 'ফ্যাক্টরি কর্মী', company: 'মানুটেক লিমিটেড', location: 'ফরিদাবাদ' },
-    7: { title: 'ইলেকট্রিশিয়ান সহায়ক', company: 'পাওয়ার ফিক্স কোম্পানি', location: 'দিল্লি' },
+    4: { title: 'গোদাম কর্মী', company: 'স্মার্ট ওয়্যারহাউসিং', location: 'দিল্লি' },
+    5: { title: 'নিরাপত্তা প্রহরী (গার্ড)', company: 'সিকিউর ইন্ডিয়া', location: 'নয়ডা' },
+    6: { title: 'কারখানা শ্রমিক', company: 'ম্যানুটেক লিমিটেড', location: 'ফরিদাবাদ' },
+    7: { title: 'ইলেকট্রিশিয়ান সহকারী', company: 'পাওয়ারফিক্স কোং', location: 'দিল্লি' },
     8: { title: 'ডেলিভারি এক্সিকিউটিভ', company: 'কুইকশিপ', location: 'গুরুগ্রাম' },
-    9: { title: 'ট্রাক চালক', company: 'ন্যাশনাল ফ্রেট', location: 'দিল্লি' },
-    10: { title: 'হাউসকিপিং স্টাফ', company: 'ক্লিনপ্রো সার্ভিসেস', location: 'নয়েডা' },
+    9: { title: 'ট্রাক চালক', company: 'ন্যাশনাল ফ্রেইট', location: 'দিল্লি' },
+    10: { title: 'হাউসকিপিং কর্মী', company: 'ক্লিনপ্রো সার্ভিসেস', location: 'নয়ডা' },
   },
 };
 
@@ -82,6 +82,7 @@ const categoryText: Record<Language, Record<string, string>> = {
     Factory: 'Factory',
     Security: 'Security',
     Electrician: 'Electrician',
+    Housekeeping: 'Housekeeping',
   },
   hi: {
     All: 'सभी',
@@ -92,9 +93,10 @@ const categoryText: Record<Language, Record<string, string>> = {
     Factory: 'फैक्ट्री',
     Security: 'सुरक्षा',
     Electrician: 'इलेक्ट्रीशियन',
+    Housekeeping: 'सफाई / हाउसकीपिंग',
   },
   ta: {
-    All: 'அனைத்து',
+    All: 'அனைத்தும்',
     Driver: 'ஓட்டுநர்',
     Delivery: 'டெலிவரி',
     Construction: 'கட்டுமானம்',
@@ -102,26 +104,29 @@ const categoryText: Record<Language, Record<string, string>> = {
     Factory: 'தொழிற்சாலை',
     Security: 'பாதுகாப்பு',
     Electrician: 'மின்சாரம்',
+    Housekeeping: 'தூய்மைப்பணி',
   },
   te: {
-    All: 'అన్ని',
+    All: 'అన్నీ',
     Driver: 'డ్రైవర్',
     Delivery: 'డెలివరీ',
     Construction: 'నిర్మాణం',
-    Warehouse: 'గోడౌన్',
+    Warehouse: 'గిడ్డంగి',
     Factory: 'ఫ్యాక్టరీ',
     Security: 'సెక్యూరిటీ',
     Electrician: 'ఎలక్ట్రీషియన్',
+    Housekeeping: 'హౌస్‌కీపింగ్',
   },
   bn: {
-    All: 'সব',
+    All: 'সকল',
     Driver: 'চালক',
     Delivery: 'ডেলিভারি',
     Construction: 'নির্মাণ',
     Warehouse: 'গোদাম',
-    Factory: 'ফ্যাক্টরি',
+    Factory: 'কারখানা',
     Security: 'নিরাপত্তা',
     Electrician: 'ইলেকট্রিশিয়ান',
+    Housekeeping: 'হাউসকিপিং',
   },
 };
 
@@ -134,18 +139,21 @@ const perMonthText: Record<Language, string> = {
 };
 
 export function localizeJob(job: Job, language: Language) {
-  const localized = jobText[language][job.id] || jobText.en[job.id];
+  const localized = jobText[language]?.[job.id] || jobText.en[job.id] || {
+    title: job.title,
+    company: job.company,
+    location: job.location,
+  };
   const salaryAmount = job.salary.split('/')[0];
 
   return {
     ...job,
     ...localized,
-    salary: `${salaryAmount}/${perMonthText[language]}`,
-    categoryLabel: categoryText[language][job.category] || job.category,
+    salary: `${salaryAmount}/${perMonthText[language] || 'month'}`,
+    categoryLabel: categoryText[language]?.[job.category] || job.category,
   };
 }
 
 export function localizeCategory(category: string, language: Language) {
-  return categoryText[language][category] || category;
+  return categoryText[language]?.[category] || category;
 }
-

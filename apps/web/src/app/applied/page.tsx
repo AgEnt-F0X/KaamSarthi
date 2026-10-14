@@ -21,6 +21,10 @@ export default function AppliedJobsPage() {
     useApp();
   const [selectedApp, setSelectedApp] = useState<any>(null);
 
+  const selectedJob = selectedApp ? jobs.find((j) => j.id === selectedApp.jobId) : null;
+  const displayTitle = selectedJob ? localizeJob(selectedJob, language).title : selectedApp?.jobTitle;
+  const displayCompany = selectedJob ? localizeJob(selectedJob, language).company : selectedApp?.company;
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Applied':
@@ -148,8 +152,8 @@ export default function AppliedJobsPage() {
               <div className="space-y-4">
                 <div className="flex justify-between items-start">
                   <div className="space-y-1">
-                    <h2 className="text-xl font-black text-gray-900">{selectedApp.jobTitle}</h2>
-                    <p className="text-gray-500 font-bold">{selectedApp.company}</p>
+                    <h2 className="text-xl font-black text-gray-900">{displayTitle}</h2>
+                    <p className="text-gray-500 font-bold">{displayCompany}</p>
                   </div>
                   <button
                     onClick={() => setSelectedApp(null)}

@@ -2,9 +2,11 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { translations, seedJobs } from '../data/constants';
+import { localizeJob, type Job } from '../data/jobTranslations';
 import { toast } from 'sonner';
 
 export type Language = 'en' | 'hi' | 'ta' | 'te' | 'bn';
+export type LocalizedJob = ReturnType<typeof localizeJob>;
 
 export interface User {
   id: string;
@@ -40,7 +42,7 @@ interface AppContextType {
   setLanguage: (lang: Language) => void;
   isLoggedIn: boolean;
   user: User | null;
-  jobs: typeof seedJobs;
+  jobs: LocalizedJob[];
   applications: Application[];
   chatHistory: Message[];
   t: (typeof translations)['en'];
@@ -62,7 +64,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [language, setLanguageState] = useState<Language>('en');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [jobs, setJobs] = useState(seedJobs);
+  const [seedJobsList] = useState<Job[]>(seedJobs);
+
+  const jobs = React.useMemo(() => {
+    return seedJobsList.map((job) => localizeJob(job, language));
+  }, [seedJobsList, language]);
   const [applications, setApplications] = useState<Application[]>([]);
   const [chatHistory, setChatHistory] = useState<Message[]>([]);
   const [isMounted, setIsMounted] = useState(false);
@@ -186,7 +192,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const applyForJob = useCallback(
     (jobId: number) => {
-      const job = seedJobs.find((j) => j.id === jobId);
+      const job = jobs.find((j) => j.id === jobId) || seedJobs.find((j) => j.id === jobId);
       if (!job) return;
 
       setApplications((prev) => {
@@ -211,11 +217,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         const newApps = [newApp, ...prev];
         saveToStorage({ applications: newApps });
-        toast.success('Application submitted! 🎉');
+        toast.success(translations[language]?.applicationSubmitted || 'Application submitted! 🎉');
         return newApps;
       });
     },
-    [saveToStorage]
+    [jobs, language, saveToStorage]
   );
 
   const updateApplicationStatus = useCallback(
