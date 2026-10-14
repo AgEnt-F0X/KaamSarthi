@@ -16,6 +16,7 @@ import {
   MicOff,
   RotateCcw,
   Volume2,
+  VolumeX,
   X,
 } from 'lucide-react';
 import { useApp, type User, type Language } from '@/context/AppContext';
@@ -129,6 +130,19 @@ export default function SpokenGuide() {
 
   const { speak, cancel: stopSpeaking, isSpeaking, error: ttsError } =
     useSarvamTTS();
+  const [isMuted, setIsMuted] = useState(false);
+  const isMutedRef = useRef(false);
+
+  const toggleMuteGuide = useCallback(() => {
+    setIsMuted((prev) => {
+      const next = !prev;
+      isMutedRef.current = next;
+      if (next) {
+        stopSpeaking();
+      }
+      return next;
+    });
+  }, [stopSpeaking]);
 
   const speakPrompt = useCallback(
     (text: string, listenAfter = false) => {
@@ -136,7 +150,9 @@ export default function SpokenGuide() {
       const sequence = ++speechSequenceRef.current;
       setSpokenPrompt(text);
       setHeardText('');
-      speak(text, { language: sarvamLang });
+      if (!isMutedRef.current) {
+        speak(text, { language: sarvamLang });
+      }
       if (listenAfter && speechSequenceRef.current === sequence) {
         window.setTimeout(() => startListeningRef.current(), 250);
       }
@@ -547,13 +563,21 @@ export default function SpokenGuide() {
         <header className="sticky top-0 z-10 bg-white p-4 border-b border-gray-100">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="size-11 bg-emerald-600 text-white rounded-lg flex items-center justify-center">
-                <Volume2 size={23} />
-              </div>
+              <button
+                type="button"
+                onClick={toggleMuteGuide}
+                aria-label={isMuted ? 'Unmute guide voice' : 'Mute guide voice'}
+                title={isMuted ? 'Unmute guide voice' : 'Mute guide voice'}
+                className={`size-11 rounded-lg flex items-center justify-center transition-colors ${
+                  isMuted ? 'bg-gray-200 text-gray-600' : 'bg-emerald-600 text-white'
+                }`}
+              >
+                {isMuted ? <VolumeX size={23} /> : <Volume2 size={23} />}
+              </button>
               <div>
                 <h2 className="font-black text-gray-950">{copy.talkButton}</h2>
                 <p className="text-xs text-gray-500">
-                  {isSpeaking ? 'Speaking...' : isListening ? copy.listening : copy.waiting}
+                  {isMuted ? 'Muted' : isSpeaking ? 'Speaking...' : isListening ? copy.listening : copy.waiting}
                 </p>
               </div>
             </div>

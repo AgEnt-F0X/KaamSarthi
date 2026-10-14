@@ -56,11 +56,12 @@ export default function SarvamCreditBadge() {
   };
 
   const currentEngine = language === 'en' ? 'Google Speech (Free)' : 'Sarvam Saaras:v4';
+  const hasSarvamKey = !!process.env.NEXT_PUBLIC_SARVAM_API_KEY;
 
   return (
     <div
       data-testid="sarvam-credit-badge"
-      className="fixed bottom-2 right-2 sm:bottom-4 sm:right-4 z-50 select-none font-sans text-xs"
+      className="fixed bottom-20 left-3 sm:bottom-6 sm:left-6 z-50 select-none font-sans text-xs"
     >
       {/* Compact Mini Pill */}
       {!isExpanded ? (
@@ -167,6 +168,14 @@ export default function SarvamCreditBadge() {
             <div className="bg-slate-800/40 rounded p-1.5 border border-slate-700/40 text-[10px] flex items-center justify-between">
               <span className="text-slate-400">Current STT:</span>
               <span className="font-medium text-slate-200">{currentEngine}</span>
+            </div>
+
+            {/* API Key Status */}
+            <div className="bg-slate-800/40 rounded p-1.5 border border-slate-700/40 text-[10px] flex items-center justify-between">
+              <span className="text-slate-400">API Key:</span>
+              <span className={`font-mono font-semibold ${hasSarvamKey ? 'text-emerald-400' : 'text-amber-400'}`}>
+                {hasSarvamKey ? 'Configured' : 'Missing in env'}
+              </span>
             </div>
           </div>
 

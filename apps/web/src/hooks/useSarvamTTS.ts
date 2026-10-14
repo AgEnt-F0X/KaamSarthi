@@ -38,13 +38,50 @@ export function useSarvamTTS() {
   const [error, setError] = useState('');
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const isCancelledRef = useRef<boolean>(false);
+
+  const fallbackToBrowserTTS = useCallback((text: string, language?: SarvamTTSLanguage) => {
+    if (isCancelledRef.current || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = language?.replace('-IN', '-IN') || 'hi-IN';
+    utterance.rate = 1.0;
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    window.speechSynthesis.speak(utterance);
+  }, []);
+
+  const cancel = useCallback(() => {
+    isCancelledRef.current = true;
+    if (abortControllerRef.current) {
+      try {
+        abortControllerRef.current.abort();
+      } catch {}
+      abortControllerRef.current = null;
+    }
+    if (audioRef.current) {
+      try {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        audioRef.current.src = '';
+      } catch {}
+      audioRef.current = null;
+    }
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch {}
+    }
+    setIsSpeaking(false);
+  }, []);
 
   const speak = useCallback(
     async (text: string, options: SarvamTTSOptions = {}) => {
       if (!text.trim()) return;
 
-      // Stop any current speech
+      // Stop any current speech and clear cancellation flag for new utterance
       cancel();
+      isCancelledRef.current = false;
 
       if (!SARVAM_API_KEY) {
         setError('Sarvam API key not configured. Add NEXT_PUBLIC_SARVAM_API_KEY to .env.local');
@@ -79,14 +116,17 @@ export function useSarvamTTS() {
           signal: abortControllerRef.current.signal,
         });
 
+        if (isCancelledRef.current) return;
+
         if (!response.ok) {
           const body = await response.json().catch(() => null);
           throw new Error(body?.detail || `Sarvam TTS failed: ${response.status}`);
         }
 
         const data = await response.json();
+        if (isCancelledRef.current) return;
+
         const audioBase64 = data.audios?.[0];
-        
         if (!audioBase64) {
           throw new Error('No audio data received from Sarvam TTS');
         }
@@ -103,63 +143,55 @@ export function useSarvamTTS() {
         const blob = new Blob([bytes], { type: 'audio/mp3' });
         const audioUrl = URL.createObjectURL(blob);
 
-        audioRef.current = new Audio(audioUrl);
+        if (isCancelledRef.current) {
+          URL.revokeObjectURL(audioUrl);
+          return;
+        }
+
+        const audio = new Audio(audioUrl);
+        audioRef.current = audio;
         
-        audioRef.current.onended = () => {
+        audio.onended = () => {
           setIsSpeaking(false);
           URL.revokeObjectURL(audioUrl);
+          if (audioRef.current === audio) audioRef.current = null;
         };
         
-        audioRef.current.onerror = () => {
+        audio.onerror = () => {
           setError('Failed to play audio');
           setIsSpeaking(false);
           URL.revokeObjectURL(audioUrl);
+          if (audioRef.current === audio) audioRef.current = null;
         };
 
-        await audioRef.current.play();
+        if (isCancelledRef.current) {
+          URL.revokeObjectURL(audioUrl);
+          return;
+        }
+
+        await audio.play();
       } catch (err) {
-        if (err instanceof Error && err.name === 'AbortError') {
-          // Expected when cancelled
+        if (isCancelledRef.current) {
+          // Expected when cancelled/muted
+          setIsSpeaking(false);
+          return;
+        }
+        if (err instanceof Error && (err.name === 'AbortError' || err.message.includes('aborted'))) {
+          setIsSpeaking(false);
           return;
         }
         const message = err instanceof Error ? err.message : 'Sarvam TTS failed';
         setError(message);
         setIsSpeaking(false);
         
-        // Fallback to browser TTS
-        console.warn('Sarvam TTS failed, falling back to browser SpeechSynthesis:', message);
-        fallbackToBrowserTTS(text, options.language);
+        if (!isCancelledRef.current) {
+          console.warn('Sarvam TTS failed, falling back to browser SpeechSynthesis:', message);
+          fallbackToBrowserTTS(text, options.language);
+        }
       }
     },
-    []
+    [cancel, fallbackToBrowserTTS]
   );
-
-  const fallbackToBrowserTTS = useCallback((text: string, language?: SarvamTTSLanguage) => {
-    if (!('speechSynthesis' in window)) return;
-    
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = language?.replace('-IN', '-IN') || 'hi-IN';
-    utterance.rate = 1.0;
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-    window.speechSynthesis.speak(utterance);
-  }, []);
-
-  const cancel = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = '';
-      audioRef.current = null;
-    }
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
-    }
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
-    setIsSpeaking(false);
-  }, []);
 
   return {
     speak,

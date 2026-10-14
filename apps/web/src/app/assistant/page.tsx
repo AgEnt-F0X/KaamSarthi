@@ -126,6 +126,7 @@ export default function AssistantPage() {
   const sarvamLang = toSarvamLanguage(language);
   const { speak, cancel: stopSpeaking, isSpeaking } = useSarvamTTS();
   const [ttsEnabled, setTtsEnabled] = useState(true);
+  const ttsEnabledRef = useRef(ttsEnabled);
   const [input, setInput] = useState('');
   const [streamingText, setStreamingText] = useState('');
   const [mounted, setMounted] = useState(false);
@@ -133,6 +134,21 @@ export default function AssistantPage() {
   const languageCopy = copy[language];
   const isGenerating = geminiStatus === 'thinking' || geminiStatus === 'streaming';
   const hasApiKey = !!process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+
+  useEffect(() => {
+    ttsEnabledRef.current = ttsEnabled;
+  }, [ttsEnabled]);
+
+  const handleToggleMute = () => {
+    setTtsEnabled((prev) => {
+      const next = !prev;
+      ttsEnabledRef.current = next;
+      if (!next) {
+        stopSpeaking();
+      }
+      return next;
+    });
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -156,12 +172,16 @@ export default function AssistantPage() {
 
     // Always use rule-based for critical safety topics
     if (shouldUseRuleBasedAdvice(cleanMessage)) {
-      appendChatMessage('assistant', getRuleBasedAdvice(cleanMessage, language));
+      const advice = getRuleBasedAdvice(cleanMessage, language);
+      appendChatMessage('assistant', advice);
+      if (ttsEnabledRef.current) speak(advice, { language: sarvamLang });
       return;
     }
 
     if (!hasApiKey) {
-      appendChatMessage('assistant', getRuleBasedAdvice(cleanMessage, language));
+      const advice = getRuleBasedAdvice(cleanMessage, language);
+      appendChatMessage('assistant', advice);
+      if (ttsEnabledRef.current) speak(advice, { language: sarvamLang });
       return;
     }
 
@@ -170,7 +190,6 @@ export default function AssistantPage() {
       : '';
 
     try {
-      if (ttsEnabled) speak(cleanMessage, { language: sarvamLang });
       setStreamingText(languageCopy.thinking);
       const answer = await generate({
         message: cleanMessage,
@@ -180,10 +199,12 @@ export default function AssistantPage() {
       });
       if (answer) {
         appendChatMessage('assistant', answer);
-        if (ttsEnabled) speak(answer, { language: sarvamLang });
+        if (ttsEnabledRef.current) speak(answer, { language: sarvamLang });
       }
     } catch {
-      appendChatMessage('assistant', getRuleBasedAdvice(cleanMessage, language));
+      const advice = getRuleBasedAdvice(cleanMessage, language);
+      appendChatMessage('assistant', advice);
+      if (ttsEnabledRef.current) speak(advice, { language: sarvamLang });
     } finally {
       setStreamingText('');
     }
@@ -220,10 +241,10 @@ export default function AssistantPage() {
         </button>
         <button
           type="button"
-          onClick={() => { setTtsEnabled((v) => !v); if (isSpeaking) stopSpeaking(); }}
+          onClick={handleToggleMute}
           aria-label={ttsEnabled ? 'Mute voice' : 'Enable voice'}
           title={ttsEnabled ? 'Mute voice' : 'Enable voice'}
-          className={`p-2 transition-colors ${ttsEnabled ? 'text-blue-600' : 'text-gray-300'}`}
+          className={`p-2 transition-colors ${ttsEnabled ? 'text-blue-600' : 'text-gray-400'}`}
         >
           {ttsEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
         </button>
